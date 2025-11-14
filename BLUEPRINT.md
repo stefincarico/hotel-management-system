@@ -4,15 +4,35 @@ Questo documento traccia i progressi, le decisioni architetturali e le lezioni i
 
 ---
 
+# 💡 DEBITO TECNICO E MIGLIORAMENTI FUTURI
+
+Questa sezione documenta le aree dell'applicazione dove abbiamo consapevolmente scelto una soluzione semplificata per motivi didattici, con l'intenzione di migliorarla in futuro.
+
+-   **Gestione Avanzata dello Stato delle Camere:**
+    -   **Problema:** Il modello `Room` supporta tre stati (`AVAILABLE`, `MAINTENANCE`, `OUT_OF_SERVICE`), ma l'interfaccia utente attuale implementa solo un semplice "toggle" tra `AVAILABLE` e `OUT_OF_SERVICE`. Lo stato `MAINTENANCE` è inutilizzato.
+    -   **Causa:** L'implementazione del toggle è servita come esercizio didattico per il pattern di HTMX "swap di un frammento HTML".
+    -   **Soluzione Proposta:** In un modulo futuro, sostituire il singolo pulsante "toggle" con un'interfaccia più ricca (es. un dropdown con Alpine.js) che permetta a un utente autorizzato di impostare esplicitamente ciascuno dei tre stati. Questo richiederà una view più flessibile (`set_room_status` invece di `toggle_room_status`) che possa accettare lo stato desiderato come parametro.
+    -   **Stato:** Da implementare.
+
+---
+
 ## FASE 3: FRONTEND (In Corso)
 
-### Modulo 5: Tailwind CSS (Completato)
-- **Obiettivo:** Integrare un sistema di styling moderno e "utility-first".
-- **Decisioni Chiave:**
-    - Adottata la **Standalone CLI** di Tailwind per evitare di introdurre Node.js/NPM nel progetto Python, mantenendo il setup più snello.
+### Modulo 7: HTMX (In Corso)
+- **Obiettivo:** Trasformare le interfacce da "full-reload" a "partial-update" usando richieste AJAX.
+- **Implementazione Chiave:**
+    - **Soft Delete:** Sostituita la logica di cancellazione fisica (`Hard Delete`) delle camere con una cancellazione logica (`Soft Delete`), modificando il modello `Room` per includere un campo `status`. Questa decisione, guidata dalla logica di business, garantisce l'integrità dello storico dei dati.
+    - **Pattern "Swap & Replace":** Creata la prima interazione HTMX per cambiare lo stato di una camera. La view Django ora restituisce un frammento HTML (`partial template`) che HTMX usa per sostituire (`hx-swap`) l'elemento obsoleto nella pagina, creando un'esperienza utente istantanea.
 - **Lezioni Imparate:**
-    - **Criticità delle Versioni:** Affrontato e risolto un blocco critico causato dall'uso di una versione alpha instabile di Tailwind (`v4.x`). Il problema è stato risolto effettuando il downgrade alla più recente versione stabile (`v3.4.4`). Questo sottolinea l'importanza di utilizzare release stabili in sviluppo.
-    - **Debugging Strumenti Esterni:** Imparato a isolare problemi non legati al codice Django ma agli strumenti della toolchain (l'eseguibile di Tailwind stesso).
+    - Identificata una discrepanza tra la flessibilità del modello dati (3 stati per la camera) e la semplicità dell'interfaccia utente (toggle tra 2 stati). Documentato come debito tecnico da risolvere in futuro.
+
+### Modulo 6: Alpine.js (Completato)
+- **Obiettivo Raggiunto:** Aggiunta di interattività client-side leggera.
+- **Implementazione Chiave:** Creato un menu dropdown per il profilo utente, gestendo lo stato "aperto/chiuso" direttamente nell'HTML con `x-data`, `x-show` e `@click`.
+
+### Modulo 5: Tailwind CSS (Completato)
+- **Obiettivo Raggiunto:** Setup di un sistema di styling "utility-first" tramite la Standalone CLI (v3 stabile).
+- **Lezioni Imparate:** Risolto un bug critico legato all'uso di una versione alpha instabile dello strumento.
 
 ---
 

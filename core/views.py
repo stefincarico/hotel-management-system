@@ -1,15 +1,13 @@
 # core/views.py
-from django.shortcuts import render
-from django.http import HttpResponse
-
-from django.shortcuts import render
+from django.shortcuts import get_object_or_404, render
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 
+from django.views.decorators.http import require_POST 
 from django.shortcuts import redirect
-from django.shortcuts import get_object_or_404
+from django.template.loader import render_to_string
 
-from core.models import Hotel
+from core.models import Hotel, Room
 
 
 def homepage(request):
@@ -83,3 +81,88 @@ def dashboard(request):
         'active_hotel': active_hotel
     }
     return render(request, 'dashboard.html', context)
+
+@login_required
+def room_list(request):
+    # !! CONTROLLO DI SICUREZZA FONDAMENTALE !!
+    # Prendiamo l'hotel attivo dalla sessione. Se non c'è, l'utente non è autorizzato.
+    active_hotel_id = request.session.get('active_hotel_id')
+    if not active_hotel_id:
+        return HttpResponse("Seleziona prima un hotel.", status=403)
+    
+    # Filtriamo le camere SOLO per l'hotel attivo.
+    rooms = Room.objects.filter(hotel_id=active_hotel_id)
+    
+    context = {
+        'rooms': rooms,
+        'active_hotel': Hotel.objects.get(pk=active_hotel_id) # Ci serve per il titolo
+    }
+    return render(request, 'room_list.html', context)
+
+# core/views.py
+
+@require_POST
+@login_required
+def toggle_room_status(request, room_id):
+    active_hotel_id = request.session.get('active_hotel_id')
+    if not active_hotel_id:
+        return HttpResponse("Azione non permessa.", status=403)
+
+    # Il controllo di sicurezza è identico e sempre fondamentale
+    room = get_object_or_404(Room, pk=room_id, hotel_id=active_hotel_id)
+    
+    # Logica di "toggle": se è DISPONIBILE la mettiamo FUORI SERVIZIO,
+    # altrimenti la rimettiamo DISPONIBILE.
+    if room.status == Room.RoomStatus.AVAILABLE:
+        room.status = Room.RoomStatus.OUT_OF_SERVICE
+    else:
+        room.status = Room.RoomStatus.AVAILABLE
+    
+    room.save()
+    
+    # Ora la parte nuova: invece di una risposta vuota, renderizziamo
+    # un "partial template", passandogli solo l'oggetto 'room' aggiornato.
+    context = {'room': room}
+    return render(request, 'partials/room_card.html', context)
+
+@login_required
+def create_room_form(request):
+    # Questa view serve solo a restituire il pezzo di HTML del form.
+    # Non ha logica complessa.
+    return render(request, 'partials/room_form.html')
+
+@login_required
+def get_add_room_button(request):
+    # Questa view serve solo a restituire il pezzo di HTML del pulsante
+    return render(request, 'partials/add_room_button.html')
+
+@require_POST
+@login_required
+def create_room(request):
+    active_hotel_id = request.session.get('active_hotel_id')
+    if not active_hotel_id:
+        return HttpResponse("Azione non permessa.", status=403)
+
+    new_room = Room.objects.create(
+        hotel_id=active_hotel_id,
+        room_number=request.POST.get('room_number'),
+        room_type=request.POST.get('room_type'),
+        price_per_night=request.POST.get('price_per_night'),
+    )
+    
+    # Prepariamo il contesto per DUE frammenti
+    context = {'room': new_room}
+
+    # Rendiamo la card della nuova camera
+    room_card_html = render_to_string('partials/room_card.html', context)
+    
+    # E rendiamo il pulsante "Aggiungi" per resettare il form
+    add_button_html = render_to_string('partials/add_room_button.html', {})
+
+    # Uniamo i due frammenti HTML. HTMX li processerà entrambi.
+    html_response = room_card_html + add_button_html
+    
+    return HttpResponse(html_response)
+
+
+

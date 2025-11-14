@@ -1,0 +1,40 @@
+<!-- templates/partials/room_form.html -->
+<form hx-post="{% url 'create_room' %}" 
+      hx-target="#room-list-container" 
+      hx-swap="beforeend"
+      class="mt-6 bg-white p-6 rounded-lg shadow-md space-y-4">
+
+    {% csrf_token %}
+    <h3 class="text-xl font-semibold">Aggiungi Nuova Camera</h3>
+
+    <!-- Campi del Form -->
+    <div>
+        <label for="room_number" class="block text-sm font-medium text-gray-700">Numero Camera</label>
+        <input type="text" name="room_number" id="room_number" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+    </div>
+    <div>
+        <label for="room_type" class="block text-sm font-medium text-gray-700">Tipo Camera</label>
+        <select name="room_type" id="room_type" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+            <option value="SINGLE">👤 Singola</option>
+            <option value="DOUBLE">👩‍❤️‍👨 Doppia</option>
+            <option value="SUITE">🌟 Suite</option>
+        </select>
+    </div>
+    <div>
+        <label for="price_per_night" class="block text-sm font-medium text-gray-700">💶 Prezzo per Notte</label>
+        <input type="number" name="price_per_night" id="price_per_night" step="0.01" required class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm">
+    </div>
+
+    <!-- Pulsanti di Azione -->
+    <div class="flex justify-end space-x-2">
+        <button type="button" 
+        hx-get="{% url 'get_add_room_button' %}" 
+        hx-target="#form-container"
+        hx-swap="innerHTML"
+        class="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300">
+        Annulla
+        </button>
+        <button type="submit" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">
+        Salva Camera</button>
+    </div>
+</form>

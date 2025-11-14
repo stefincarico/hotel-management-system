@@ -2,7 +2,7 @@
 
 from django.contrib import admin
 from django.contrib.auth.admin import UserAdmin as BaseUserAdmin
-from .models import User, Hotel, UserHotelRole
+from .models import User, Hotel, UserHotelRole, Room
 
 # -----------------------------------------------------------------------------
 # Configurazione per il modello USER
@@ -33,3 +33,10 @@ admin.site.register(User, CustomUserAdmin)
 
 # Registriamo UserHotelRole in modo semplice, perché non ha logica complessa.
 admin.site.register(UserHotelRole)
+
+
+@admin.register(Room)
+class RoomAdmin(admin.ModelAdmin):
+    list_display = ('room_number', 'hotel', 'room_type', 'price_per_night', 'status')
+    list_filter = ('hotel', 'room_type', 'status')
+    search_fields = ('room_number',)

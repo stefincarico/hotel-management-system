@@ -1,7 +1,9 @@
 # config/urls.py
 from django.contrib import admin
 from django.urls import path, include
-from core.views import homepage, dashboard, select_hotel, activate_hotel
+from core.views import get_add_room_button, homepage, dashboard, select_hotel, activate_hotel, room_list, toggle_room_status, create_room_form, create_room
+
+
 
 
 urlpatterns = [
@@ -13,5 +15,10 @@ urlpatterns = [
     # Questo URL cattura un numero intero (l'ID dell'hotel) e lo passa
     # alla view 'activate_hotel' come argomento 'hotel_id'.
     path('activate-hotel/<int:hotel_id>/', activate_hotel, name='activate_hotel'), 
+    path('rooms/', room_list, name='room_list'),
+    path('rooms/toggle-status/<int:room_id>/', toggle_room_status, name='toggle_room_status'),
+    path('rooms/create-form/', create_room_form, name='create_room_form'),
+    path('rooms/create/', create_room, name='create_room'),
+    path('rooms/add-button/', get_add_room_button, name='get_add_room_button'),
 ]
 
