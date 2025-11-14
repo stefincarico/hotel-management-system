@@ -1,0 +1,15 @@
+# Ambiente virtuale - MAI committare l'ambiente virtuale
+venv/
+
+# File di configurazione di VS Code
+.vscode/
+
+# Cache di Python
+__pycache__/
+*.pyc
+
+# Database locale (lo vedremo più avanti)
+db.sqlite3
+
+# File con variabili d'ambiente (segreti!)
+.env
