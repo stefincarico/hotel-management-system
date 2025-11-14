@@ -13,3 +13,7 @@ db.sqlite3
 
 # File con variabili d'ambiente (segreti!)
 .env
+
+# altro
+_cartella_di_servizio/
+
