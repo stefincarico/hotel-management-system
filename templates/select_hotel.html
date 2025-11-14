@@ -1,0 +1,18 @@
+<!-- templates/select_hotel.html -->
+{% extends "base.html" %}
+
+{% block content %}
+    <h2>Seleziona un Hotel</h2>
+    <p>Ciao {{ user.username }}, scegli l'hotel in cui vuoi operare.</p>
+    
+    {% if hotels %}
+        <ul>
+        {% for hotel in hotels %}
+            {# Per ora questo link non farà nulla, lo implementeremo tra un attimo #}
+            <li><a href="#">{{ hotel.name }} ({{ hotel.city }})</a></li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>Non risulti assegnato a nessun hotel.</p>
+    {% endif %}
+{% endblock %}

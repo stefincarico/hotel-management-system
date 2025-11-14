@@ -132,6 +132,6 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'core.User'
 
-LOGIN_REDIRECT_URL = '/'
+LOGIN_REDIRECT_URL = 'select_hotel' # Usiamo il nome dell'URL, non il path
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/login/'
