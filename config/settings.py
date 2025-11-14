@@ -125,6 +125,14 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+STATICFILES_DIRS = [
+    BASE_DIR / 'static',
+]
+
+# Aggiungiamo STATIC_ROOT. In sviluppo, Django non lo usa per servire i file,
+# ma la funzione static() in urls.py ne ha bisogno per funzionare correttamente.
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

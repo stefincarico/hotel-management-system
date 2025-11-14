@@ -1,19 +1,22 @@
 <!-- templates/base.html -->
+{% load static %}  <!-- 1. Carica i tag per i file statici -->
 <!DOCTYPE html>
 <html lang="it">
 <head>
     <meta charset="UTF-8">
     <title>Sistema Hotel</title>
+    <!-- 2. Aggiungi il link al nostro CSS generato -->
+    <link href="{% static 'css/output.css' %}" rel="stylesheet">
 </head>
-<body>
+<body class="bg-gray-100 text-gray-800"> <!-- 3. Aggiungiamo classi di prova! -->
     <nav>
-        <a href="{% url 'homepage' %}">🏡 Homepage</a>
+        <a href="{% url 'homepage' %}">Homepage</a>
         <hr>
     </nav>
-    <main>
+    <main class="p-8"> <!-- 4. Altra classe di prova -->
         {% block content %}
         <!-- Il contenuto specifico di ogni pagina andrà qui -->
         {% endblock %}
     </main>
 </body>
-</html> 
+</html>

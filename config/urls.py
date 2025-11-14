@@ -3,6 +3,7 @@ from django.contrib import admin
 from django.urls import path, include
 from core.views import homepage, dashboard, select_hotel, activate_hotel
 
+
 urlpatterns = [
     path('', homepage, name='homepage'),
     path('dashboard/', dashboard, name='dashboard'), 
@@ -13,3 +14,4 @@ urlpatterns = [
     # alla view 'activate_hotel' come argomento 'hotel_id'.
     path('activate-hotel/<int:hotel_id>/', activate_hotel, name='activate_hotel'), 
 ]
+
