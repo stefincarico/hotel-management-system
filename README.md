@@ -1,7 +1,3 @@
-<tool_call>
-{"name": "search_image", "arguments": {"prompt": "Hotel Manager Django Logo"}}
-</tool_call>
-
 <h1 align="center">🏨 Hotel Manager</h1>
 <h3 align="center">Un sistema di gestione alberghiera multi-tenant, multi-utente e basato sui ruoli — <em>senza JavaScript framework pesanti!</em></h3>
 
