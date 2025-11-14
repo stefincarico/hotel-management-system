@@ -6,14 +6,18 @@ from django.shortcuts import render
 from django.http import HttpResponse
 from django.contrib.auth.decorators import login_required
 
-# ... la tua view homepage ...
+from django.shortcuts import redirect
+from django.shortcuts import get_object_or_404
+
+from core.models import Hotel
+
+
 def homepage(request):
     return render(request, 'homepage.html')
 
 @login_required
 def dashboard(request):
     return render(request, 'dashboard.html')
-
 
 
 @login_required
@@ -36,3 +40,46 @@ def select_hotel(request):
         'hotels': hotels
     }
     return render(request, 'select_hotel.html', context)
+
+@login_required
+def activate_hotel(request, hotel_id):
+    # 1. CONTROLLO DI SICUREZZA FONDAMENTALE
+    # Verifichiamo che l'utente abbia un ruolo attivo per l'hotel richiesto.
+    # Se un utente prova a "indovinare" l'URL con un ID di un hotel a cui non 
+    # ha accesso, questa query non restituirà nulla.
+    can_access = request.user.roles.filter(hotel_id=hotel_id, is_active=True).exists()
+
+    if not can_access:
+        # Se non ha accesso, gli neghiamo il permesso.
+        return HttpResponse("Accesso negato. Non hai un ruolo attivo in questo hotel.", status=403)
+
+    # 2. SALVATAGGIO IN SESSIONE
+    # La sessione di Django è come un dizionario Python. Possiamo scriverci dentro
+    # quello che vogliamo. Il dato verrà salvato sul server e legato al cookie
+    # del browser dell'utente.
+    request.session['active_hotel_id'] = hotel_id
+    
+    # 3. REDIRECT AL DASHBOARD
+    # Ora che l'hotel è "attivo", mandiamo l'utente al suo pannello di controllo.
+    return redirect('dashboard')
+
+@login_required
+def dashboard(request):
+    # Leggiamo l'ID dell'hotel attivo dalla sessione.
+    # Usiamo .get() che è più sicuro: se la chiave non esiste, restituisce None invece di un errore.
+    active_hotel_id = request.session.get('active_hotel_id')
+
+    # Se non c'è un hotel attivo, forse l'utente è arrivato qui per sbaglio.
+    # Lo rimandiamo alla pagina di selezione.
+    if not active_hotel_id:
+        return redirect('select_hotel')
+
+    # Recuperiamo l'oggetto Hotel dal database per poter mostrare il suo nome.
+    # get_object_or_404 è una scorciatoia che restituisce un oggetto o una pagina 404 Not Found
+    # se l'oggetto con quell'ID non esiste. È ottimo per la robustezza.
+    active_hotel = get_object_or_404(Hotel, pk=active_hotel_id)
+
+    context = {
+        'active_hotel': active_hotel
+    }
+    return render(request, 'dashboard.html', context)

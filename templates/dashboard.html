@@ -2,7 +2,13 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h2>☢️ Dashboard Privata</h2>
-    <p>Se vedi questa pagina, significa che sei autenticato con successo. 🏴‍☠️</p>
-    <p>Ciao di nuovo, {{ user.username }}!</p>
+    {# Controlliamo se la variabile active_hotel esiste #}
+    {% if active_hotel %}
+        <h2>Dashboard per: 🏨 {{ active_hotel.name }} 🏨</h2>
+        <p>Stai operando all'interno dell'hotel <strong>{{ active_hotel.name }}</strong> a {{ active_hotel.city }}.</p>
+        <p><a href="{% url 'select_hotel' %}">Cambia hotel</a></p>
+    {% else %}
+        <h2>☢️ Dashboard Privata</h2>
+        <p>Per favore, <a href="{% url 'select_hotel' %}">seleziona un hotel</a> per iniziare.</p>
+    {% endif %}
 {% endblock %}

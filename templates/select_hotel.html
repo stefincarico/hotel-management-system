@@ -8,8 +8,8 @@
     {% if hotels %}
         <ul>
         {% for hotel in hotels %}
-            {# Per ora questo link non farà nulla, lo implementeremo tra un attimo #}
-            <li><a href="#">{{ hotel.name }} ({{ hotel.city }})</a></li>
+            {# Ora il link punta al nostro nuovo URL, passando l'ID specifico di ogni hotel nel ciclo #}
+            <li><a href="{% url 'activate_hotel' hotel.id %}">{{ hotel.name }} ({{ hotel.city }})</a></li>
         {% endfor %}
         </ul>
     {% else %}
