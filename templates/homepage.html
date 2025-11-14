@@ -6,7 +6,11 @@
     
     {% if user.is_authenticated %}
         <p>Ciao, {{ user.username }} 😀</p>
-        <form action="{% url 'logout' %}" method="post">
+
+        {# Aggiungiamo un link per andare al dashboard se l'utente è loggato #}
+        <a href="{% url 'dashboard' %}">Vai alla Dashboard</a>
+
+        <form action="{% url 'logout' %}" method="post" style="margin-top: 1em;">
             {% csrf_token %}
             <button type="submit">Logout</button>
         </form>
