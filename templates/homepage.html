@@ -1,13 +1,17 @@
 <!-- templates/homepage.html -->
-<!DOCTYPE html>
-<html lang="it">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema Hotel</title>
-</head>
-<body>
-    <h1>Benvenuto nel Sistema di Gestione Hotel</h1>
-    <p>Questa pagina è generata da un vero file Template!</p>
-</body>
-</html>
+{% extends "base.html" %}
+
+{% block content %}
+    <h1>🏨 Benvenuto nel Sistema di Gestione Hotel 🛎️</h1>
+    
+    {% if user.is_authenticated %}
+        <p>Ciao, {{ user.username }} 😀</p>
+        <form action="{% url 'logout' %}" method="post">
+            {% csrf_token %}
+            <button type="submit">Logout</button>
+        </form>
+    {% else %}
+        <p>Per favore, effettua il login per continuare 😒</p>
+        <a href="{% url 'login' %}">Login</a>
+    {% endif %}
+{% endblock %}

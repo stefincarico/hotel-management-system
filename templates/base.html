@@ -1,0 +1,19 @@
+<!-- templates/base.html -->
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Sistema Hotel</title>
+</head>
+<body>
+    <nav>
+        <a href="{% url 'homepage' %}">🏡 Homepage</a>
+        <hr>
+    </nav>
+    <main>
+        {% block content %}
+        <!-- Il contenuto specifico di ogni pagina andrà qui -->
+        {% endblock %}
+    </main>
+</body>
+</html>

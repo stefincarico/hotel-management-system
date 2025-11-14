@@ -21,7 +21,7 @@ class User(AbstractUser):
     pass # 'pass' significa che per ora non aggiungiamo nulla di nuovo
 
     def __str__(self):
-        return self.username
+        return self.get_full_name() or self.username
     
 class UserHotelRole(models.Model):
     class Role(models.TextChoices):

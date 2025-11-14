@@ -1,10 +1,15 @@
 # config/urls.py
 from django.contrib import admin
-from django.urls import path
-from core.views import homepage  # <-- 1. IMPORTA LA TUA VIEW
+from django.urls import path, include  # <-- Assicurati di importare 'include'
+
+from core.views import homepage
 
 urlpatterns = [
-    # 2. COLLEGA L'URL ALLA VIEW
-    path('', homepage, name='homepage'), # '' significa la root del sito (es. http://127.0.0.1:8000/)
+    path('', homepage, name='homepage'),
+    
+    # Aggiungi questa riga. Delega la gestione di tutti gli URL
+    # che iniziano con 'accounts/' al sistema di autenticazione di Django.
+    path('accounts/', include('django.contrib.auth.urls')),
+    
     path('admin/', admin.site.urls),
 ]
