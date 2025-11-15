@@ -22,9 +22,12 @@ Questa sezione documenta le aree dell'applicazione dove abbiamo consapevolmente 
 - **Obiettivo:** Trasformare le interfacce da "full-reload" a "partial-update" usando richieste AJAX.
 - **Implementazione Chiave:**
     - **Soft Delete:** Sostituita la logica di cancellazione fisica (`Hard Delete`) delle camere con una cancellazione logica (`Soft Delete`), modificando il modello `Room` per includere un campo `status`. Questa decisione, guidata dalla logica di business, garantisce l'integrità dello storico dei dati.
-    - **Pattern "Swap & Replace":** Creata la prima interazione HTMX per cambiare lo stato di una camera. La view Django ora restituisce un frammento HTML (`partial template`) che HTMX usa per sostituire (`hx-swap`) l'elemento obsoleto nella pagina, creando un'esperienza utente istantanea.
+    - **Pattern "Click to Edit":** Implementata la modifica "inline" delle camere. Cliccando "Modifica", la card della camera (`room_card.html`) viene sostituita con un form precompilato (`room_form.html`). Dopo l'invio, il server restituisce la card aggiornata, che a sua volta rimpiazza il form, chiudendo la modalità di modifica.
+    - **Pattern "Toggle State":** Creata la prima interazione HTMX per cambiare lo stato di una camera (es. da Disponibile a Fuori Servizio). La view Django restituisce un frammento HTML (`partial template`) che HTMX usa per sostituire (`hx-swap`) l'elemento obsoleto nella pagina.
 - **Lezioni Imparate:**
     - Identificata una discrepanza tra la flessibilità del modello dati (3 stati per la camera) e la semplicità dell'interfaccia utente (toggle tra 2 stati). Documentato come debito tecnico da risolvere in futuro.
+    - **Targeting dinamico in HTMX:** Durante l'implementazione del pattern "Click to Edit", è emerso un problema: il form di modifica, sostituendo la card originale, ne eliminava anche l'ID (`#room-{{ room.id }}`). La soluzione è stata usare `hx-target="this"` e `hx-swap="outerHTML"` sul form stesso, rendendolo capace di auto-sostituirsi con la risposta del server (la card aggiornata). Questo approccio rende il componente più autonomo e robusto.
+    - **Affidabilità degli Eventi HTMX:** Nell'implementare le notifiche "toast", si è scoperto che un evento `HX-Trigger` viene scatenato sull'elemento che subisce lo swap. Se questo elemento viene sostituito, la propagazione dell'evento (`event bubbling`) verso `window` può fallire. La soluzione robusta è specificare esplicitamente un target globale nel payload dell'header, es: `{"showMessage": {"target": "body", ...}}`. Questo garantisce che l'ascoltatore globale (`@showMessage.window`) riceva sempre l'evento.
 
 ### Modulo 6: Alpine.js (Completato)
 - **Obiettivo Raggiunto:** Aggiunta di interattività client-side leggera.

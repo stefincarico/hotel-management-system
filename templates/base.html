@@ -61,9 +61,50 @@
         <!-- Il contenuto specifico di ogni pagina andrà qui -->
         {% endblock %}
     </main>
-    <!-- Aggiungiamo ALPINE.JS qui -->
+
+    <!-- Contenitore per le notifiche "Toast" -->
+    <div 
+        x-data="toastComponent()"
+        x-show="show"
+        x-transition:enter="transform ease-out duration-300 transition"
+        x-transition:enter-start="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
+        x-transition:enter-end="translate-y-0 opacity-100 sm:translate-x-0"
+        x-transition:leave="transition ease-in duration-100"
+        x-transition:leave-start="opacity-100"
+        x-transition:leave-end="opacity-0"
+        class="fixed bottom-4 right-4 px-4 py-2 rounded-md text-white"
+        :class="{ 'bg-green-500': level === 'success', 'bg-red-500': level === 'error' }"
+        style="display: none;"
+    >
+        <p x-text="message"></p>
+    </div>
+
+    <script>
+        document.addEventListener('alpine:init', () => {
+            Alpine.data('toastComponent', () => ({
+                message: 'In attesa di un evento...',
+                level: 'success', // Default level
+                show: false, 
+                timer: null,
+                init() {
+                    // Espone il metodo showToast globalmente
+                    window.showToast = this.showToast.bind(this);
+                },
+                showToast(payload) {
+                    clearTimeout(this.timer);
+                    this.message = payload.message;
+                    this.level = payload.level || 'success'; // Usa il livello dal payload o default
+                    this.show = true;
+                    this.timer = setTimeout(() => this.show = false, 3000);
+                }
+            }));
+        });
+    </script>
+
+    <div id="toast-handler"></div>
+    <!-- Aggiungiamo ALPINE.JS qui, DEFER e PRIMA di HTMX -->
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <!-- Aggiungiamo HTMX qui -->
-    <script src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
+    <!-- Aggiungiamo HTMX qui, DEFER e DOPO Alpine -->
+    <script defer src="https://unpkg.com/htmx.org@1.9.10" integrity="sha384-D1Kt99CQMDuVetoL1lrYwg5t+9QdHe7NLX/SoJYkXDFfX37iInKRy5xLSi8nO7UC" crossorigin="anonymous"></script>
 </body>
 </html>

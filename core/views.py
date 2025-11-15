@@ -6,6 +6,7 @@ from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST 
 from django.shortcuts import redirect
 from django.template.loader import render_to_string
+import json
 
 from core.models import Hotel, Room
 
@@ -192,8 +193,38 @@ def update_room(request, room_id):
     room.price_per_night = request.POST.get('price_per_night')
     room.save()
     
-    # Restituiamo il partial della card AGGIORNATO
+    # 1. Prepariamo il template della card aggiornata
     context = {'room': room}
-    return render(request, 'partials/room_card.html', context)
+    html = render_to_string('partials/room_card.html', context, request=request)
+    
+    # 2. Prepariamo il template della card aggiornata
+    context = {'room': room}
+    room_card_html = render_to_string('partials/room_card.html', context, request=request)
+    
+    # 3. Strategia JavaScript nativa per il Toast
+    # Creiamo un payload JSON per il nostro evento
+    trigger_payload = {
+        "message": f"Camera {room.room_number} aggiornata con successo!",
+        "level": "success"
+    }
+    payload_json = json.dumps(trigger_payload)
 
-
+    # Creiamo un tag <script> che verrà eseguito da HTMX dopo lo swap.
+    # Questo approccio è il più robusto perché usa le API native del browser
+    # e non si affida all'inizializzazione di Alpine.js (x-init).
+    toast_trigger_script = f"""
+    <script>
+        // Chiamiamo direttamente il metodo showToast esposto globalmente
+        if (window.showToast) {{
+            window.showToast({payload_json});
+        }} else {{
+            // Fallback o log per debug se window.showToast non è ancora disponibile
+            console.error("window.showToast non è definito. Alpine.js potrebbe non essere caricato o inizializzato correttamente.");
+        }}
+    </script>
+    """
+    
+    # 4. Uniamo l'HTML principale e lo script
+    final_html = room_card_html + toast_trigger_script
+    
+    return HttpResponse(final_html)

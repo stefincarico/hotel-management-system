@@ -38,14 +38,18 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-
-        # Le nostre app
+    
+    # App di terze parti
+    'corsheaders',
+    
+    # Le nostre app
     'core',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware', # <-- Aggiunto qui in alto
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -143,3 +147,11 @@ AUTH_USER_MODEL = 'core.User'
 LOGIN_REDIRECT_URL = 'select_hotel' # Usiamo il nome dell'URL, non il path
 LOGOUT_REDIRECT_URL = '/'
 LOGIN_URL = '/accounts/login/'
+
+# --- Impostazioni per django-cors-headers ---
+
+# Per ora, permettiamo tutte le origini. In produzione, dovresti restringerlo.
+CORS_ALLOW_ALL_ORIGINS = True 
+
+# Diciamo al browser di esporre il nostro header personalizzato a JavaScript
+CORS_EXPOSE_HEADERS = ['HX-Trigger']

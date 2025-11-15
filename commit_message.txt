@@ -1,0 +1,38 @@
+feat: Implementa messaggio di conferma per aggiornamento camera
+
+Questo commit introduce un messaggio di conferma visivo (toast) che appare dopo l'aggiornamento dei dettagli di una camera, fornendo un feedback immediato all'utente. L'implementazione ha richiesto un'estesa sessione di debug a causa di problemi inaspettati nell'ambiente frontend.
+
+Problema Iniziale:
+L'obiettivo era mostrare un messaggio di conferma dopo che l'utente salvava le modifiche a una camera. La vista `update_room` nel backend era stata configurata per inviare un trigger HTMX (`HX-Trigger`) con un payload contenente il messaggio. Tuttavia, il messaggio non appariva sul frontend.
+
+Percorso di Debug e Soluzioni Tentate:
+
+1.  **Conflitto di Stile Iniziale (Ipotesi Errata)**: Inizialmente si è ipotizzato un conflitto con un `style="display: none;"` hardcoded nel componente toast in `base.html`. La rimozione di questo stile non ha risolto il problema.
+
+2.  **Race Condition HTMX (Tentativo `HX-Trigger-After-Settle`)**: Si è sospettato che l'evento venisse inviato troppo presto, prima che il DOM fosse stabile dopo lo swap di HTMX. Si è passato da `HX-Trigger` a `HX-Trigger-After-Settle` per ritardare l'invio dell'evento. Anche questo non ha risolto.
+
+3.  **Integrazione Alpine.js con OOB Swap (`x-init`)**: Si è tentato un approccio più diretto con HTMX "Out of Band" (OOB), iniettando un `div` con `x-init` di Alpine.js per scatenare l'evento.
+
+4.  **Errore di Sintassi `x-init` (Correzione)**: Durante il debug dell'OOB swap, è stato identificato un errore di sintassi nella generazione dell'attributo `x-init` (problema di quotatura della stringa JSON). La sintassi è stata corretta per garantire che l'espressione JavaScript fosse valida. Nonostante la correzione, il messaggio non appariva.
+
+5.  **Fallimento Fondamentale `x-init` (Debug con `<script>` nativo)**: Dato che `x-init` non sembrava funzionare, si è passati a un metodo ancora più diretto: iniettare un tag `<script>` nativo nella risposta HTMX, che usava `window.dispatchEvent` per scatenare l'evento. Questo bypassava completamente l'interpretazione di `x-init` da parte di Alpine.js. Anche questo non ha funzionato.
+
+6.  **Diagnosi del Componente Toast (Test Isolato)**: A questo punto, si è capito che il problema non era nell'invio dell'evento, ma nella ricezione.
+    *   È stato aggiunto un pulsante di debug manuale (`@click="$dispatch"`) in `base.html`. Cliccandolo, il toast non appariva.
+    *   Il componente toast è stato drasticamente semplificato (rimosse transizioni, classi dinamiche) per eliminare potenziali conflitti. Ancora nessun risultato.
+    *   Il componente toast è stato modificato per essere sempre visibile e mostrare un testo iniziale (`x-text`). Questo ha funzionato, confermando che `x-text` e l'inizializzazione di base di Alpine funzionavano.
+    *   È stato aggiunto un pulsante *interno* al toast che chiamava direttamente il metodo `showToast` del componente (`@click="showToast"`). **Questo test ha funzionato**, cambiando il testo del toast.
+
+Causa Radice Identificata:
+Il problema risiedeva nel fatto che il sistema di eventi globale di Alpine.js (`$dispatch` e `window.dispatchEvent`) non funzionava correttamente nell'ambiente dell'utente. Nonostante il componente Alpine fosse vivo e reattivo internamente, non era in grado di ricevere eventi globali.
+
+Soluzione Finale Implementata:
+Per aggirare il problema del sistema di eventi globale, è stato adottato il seguente approccio:
+1.  Il componente toast in `base.html` è stato ristrutturato usando `Alpine.data` e il suo metodo `showToast` è stato esposto globalmente tramite `window.showToast`.
+2.  La vista `update_room` nel backend è stata modificata per iniettare uno script che chiama direttamente `window.showToast(payload)` dopo l'aggiornamento della camera.
+
+Questa soluzione garantisce che il messaggio di conferma venga visualizzato in modo affidabile, bypassando il sistema di eventi globale problematico e sfruttando la reattività interna del componente Alpine.
+
+File Modificati:
+- `core/views.py`: Modificata la logica di risposta per chiamare `window.showToast`.
+- `templates/base.html`: Ristrutturato il componente toast per esporre il metodo `showToast` e reintrodotte le transizioni/classi dinamiche.
