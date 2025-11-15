@@ -1,9 +1,7 @@
 <!-- templates/partials/add_room_button.html -->
-<div id="form-container" hx-swap-oob="true">
-    <button hx-get="{% url 'create_room_form' %}"
-            hx-target="#form-container"
-            hx-swap="innerHTML"
-            class="bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700">
-        Aggiungi Camera
-    </button>
-</div>
+<button hx-get="{% url 'core:create_room_form' %}"
+        hx-target="#form-container"
+        hx-swap="innerHTML"
+        class="bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700">
+    Aggiungi Camera
+</button>

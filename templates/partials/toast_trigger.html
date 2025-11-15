@@ -1,0 +1,11 @@
+{# templates/partials/toast_trigger.html #}
+{# Questo template riceve un 'payload_json' dal contesto #}
+<script>
+    // Chiamiamo direttamente il metodo showToast esposto globalmente
+    if (window.showToast) {
+        // Usiamo 'safe' per evitare che Django faccia l'escape delle virgolette nel JSON
+        window.showToast({{ payload_json|safe }});
+    } else {
+        console.error("window.showToast non è definito. Alpine.js potrebbe non essere caricato o inizializzato correttamente.");
+    }
+</script>

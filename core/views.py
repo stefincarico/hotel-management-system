@@ -57,9 +57,9 @@ def activate_hotel(request, hotel_id):
     # del browser dell'utente.
     request.session['active_hotel_id'] = hotel_id
     
-    # 3. REDIRECT AL DASHBOARD
+    # 3. REDIRECT AL DASHBOARD (usando il namespace 'core')
     # Ora che l'hotel è "attivo", mandiamo l'utente al suo pannello di controllo.
-    return redirect('dashboard')
+    return redirect('core:dashboard')
 
 @login_required
 def dashboard(request):
@@ -70,7 +70,7 @@ def dashboard(request):
     # Se non c'è un hotel attivo, forse l'utente è arrivato qui per sbaglio.
     # Lo rimandiamo alla pagina di selezione.
     if not active_hotel_id:
-        return redirect('select_hotel')
+        return redirect('core:select_hotel')
 
     # Recuperiamo l'oggetto Hotel dal database per poter mostrare il suo nome.
     # get_object_or_404 è una scorciatoia che restituisce un oggetto o una pagina 404 Not Found
@@ -156,11 +156,13 @@ def create_room(request):
     # Rendiamo la card della nuova camera
     room_card_html = render_to_string('partials/room_card.html', context)
     
-    # E rendiamo il pulsante "Aggiungi" per resettare il form
-    add_button_html = render_to_string('partials/add_room_button.html', {})
+    # Rendiamo il pulsante "Aggiungi" (che ora è solo un <button>)
+    add_button_html = render_to_string('partials/add_room_button.html', {}, request=request)
+    # Lo avvolgiamo in un div con l'attributo OOB per resettare il form container
+    oob_add_button_html = f'<div id="form-container" hx-swap-oob="true">{add_button_html}</div>'
 
     # Uniamo i due frammenti HTML. HTMX li processerà entrambi.
-    html_response = room_card_html + add_button_html
+    html_response = room_card_html + oob_add_button_html
     
     return HttpResponse(html_response)
 
@@ -194,37 +196,30 @@ def update_room(request, room_id):
     room.save()
     
     # 1. Prepariamo il template della card aggiornata
-    context = {'room': room}
-    html = render_to_string('partials/room_card.html', context, request=request)
+    room_card_html = render_to_string('partials/room_card.html', {'room': room}, request=request)
     
-    # 2. Prepariamo il template della card aggiornata
-    context = {'room': room}
-    room_card_html = render_to_string('partials/room_card.html', context, request=request)
-    
-    # 3. Strategia JavaScript nativa per il Toast
-    # Creiamo un payload JSON per il nostro evento
+    # 2. Prepariamo il trigger per il toast
     trigger_payload = {
         "message": f"Camera {room.room_number} aggiornata con successo!",
         "level": "success"
     }
-    payload_json = json.dumps(trigger_payload)
-
-    # Creiamo un tag <script> che verrà eseguito da HTMX dopo lo swap.
-    # Questo approccio è il più robusto perché usa le API native del browser
-    # e non si affida all'inizializzazione di Alpine.js (x-init).
-    toast_trigger_script = f"""
-    <script>
-        // Chiamiamo direttamente il metodo showToast esposto globalmente
-        if (window.showToast) {{
-            window.showToast({payload_json});
-        }} else {{
-            // Fallback o log per debug se window.showToast non è ancora disponibile
-            console.error("window.showToast non è definito. Alpine.js potrebbe non essere caricato o inizializzato correttamente.");
-        }}
-    </script>
-    """
+    toast_context = {'payload_json': json.dumps(trigger_payload)}
+    toast_trigger_script = render_to_string('partials/toast_trigger.html', toast_context)
     
-    # 4. Uniamo l'HTML principale e lo script
+    # 3. Uniamo l'HTML principale e lo script
     final_html = room_card_html + toast_trigger_script
     
     return HttpResponse(final_html)
+
+@login_required
+def get_room_card(request, room_id):
+    """
+    Restituisce il frammento HTML di una singola room card.
+    Utile per annullare la modifica.
+    """
+    active_hotel_id = request.session.get('active_hotel_id')
+    if not active_hotel_id:
+        return HttpResponse("Azione non permessa.", status=403)
+
+    room = get_object_or_404(Room, pk=room_id, hotel_id=active_hotel_id)
+    return render(request, 'partials/room_card.html', {'room': room})

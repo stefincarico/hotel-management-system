@@ -2,11 +2,11 @@
 
 <!-- Logica condizionale per l'URL e il metodo HTMX -->
 <form {% if room %}
-        hx-post="{% url 'update_room' room.id %}" 
+        hx-post="{% url 'core:update_room' room.id %}" 
         hx-target="this" 
         hx-swap="outerHTML"
       {% else %}
-        hx-post="{% url 'create_room' %}"
+        hx-post="{% url 'core:create_room' %}"
         hx-target="#room-list-container"
         hx-swap="beforeend"
       {% endif %}
@@ -48,7 +48,13 @@
 
     <!-- Pulsanti di Azione -->
     <div class="flex justify-end space-x-2">
-        <button type="button" hx-get="{% url 'get_add_room_button' %}" hx-target="#form-container" hx-swap="innerHTML" class="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300">Annulla</button>
+        {% if room %}
+            {# MODIFICA: Annulla ricarica la card originale #}
+            <button type="button" hx-get="{% url 'core:get_room_card' room.id %}" hx-target="closest form" hx-swap="outerHTML" class="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300">Annulla</button>
+        {% else %}
+            {# CREAZIONE: Annulla ripristina il pulsante "Aggiungi" #}
+            <button type="button" hx-get="{% url 'core:get_add_room_button' %}" hx-target="#form-container" hx-swap="innerHTML" class="bg-gray-200 text-gray-800 py-2 px-4 rounded-md hover:bg-gray-300">Annulla</button>
+        {% endif %}
         <button type="submit" class="bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700">
           {% if room %}Aggiorna Camera{% else %}Salva Camera{% endif %}
         </button>

@@ -16,7 +16,7 @@
         <!-- Questo div sarà il nostro bersaglio dinamico -->
         <div id="form-container" class="mt-4 flex md:mt-0 md:ml-4">
             <!-- Il pulsante iniziale che carica il form -->
-            <button hx-get="{% url 'create_room_form' %}"
+            <button hx-get="{% url 'core:create_room_form' %}"
                     hx-target="#form-container"
                     hx-swap="innerHTML"
                     class="bg-indigo-600 text-white py-2 px-4 rounded-md shadow-sm hover:bg-indigo-700">

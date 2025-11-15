@@ -6,10 +6,11 @@
     {% if active_hotel %}
         <h2>Dashboard per: 🏨 {{ active_hotel.name }} 🏨</h2>
         <p>Stai operando all'interno dell'hotel <strong>{{ active_hotel.name }}</strong> a {{ active_hotel.city }}.</p>
-        <a href="{% url 'room_list' %}" class="text-indigo-600 hover:underline">Gestisci Camere</a>
-        <p><a href="{% url 'select_hotel' %}">Cambia hotel</a></p>
+        <a href="{% url 'core:room_list' %}" class="text-indigo-600 hover:underline">Gestisci Camere</a>
+        <p><a href="{% url 'core:select_hotel' %}">Cambia hotel</a></p>
     {% else %}
         <h2>☢️ Dashboard Privata</h2>
         <p>Per favore, <a href="{% url 'select_hotel' %}">seleziona un hotel</a> per iniziare.</p>
+        <p>Per favore, <a href="{% url 'core:select_hotel' %}">seleziona un hotel</a> per iniziare.</p>
     {% endif %}
 {% endblock %}

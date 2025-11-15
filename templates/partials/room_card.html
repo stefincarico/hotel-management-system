@@ -6,7 +6,7 @@
         <p class="text-sm text-gray-600">{{ room.get_room_type_display }} - €{{ room.price_per_night }} / notte</p>
     </div>
     <div class="flex items-center space-x-4">
-        <button hx-get="{% url 'update_room_form' room.id %}"
+        <button hx-get="{% url 'core:update_room_form' room.id %}"
             hx-target="#room-{{ room.id }}"
             hx-swap="outerHTML"
             class="text-gray-400 hover:text-indigo-600" title="Modifica camera">
@@ -20,7 +20,7 @@
         {% else %}
             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Fuori Servizio</span>
         {% endif %}
-        <form hx-post="{% url 'toggle_room_status' room.id %}" hx-target="#room-{{ room.id }}" hx-swap="outerHTML">
+        <form hx-post="{% url 'core:toggle_room_status' room.id %}" hx-target="#room-{{ room.id }}" hx-swap="outerHTML">
             {% csrf_token %}
             <button type="submit" class="text-gray-400 hover:text-red-600" title="Cambia stato">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-11a1 1 0 10-2 0v4a1 1 0 102 0V7zM10 14a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd" /></svg>

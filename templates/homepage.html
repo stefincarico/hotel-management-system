@@ -8,7 +8,7 @@
         <p>Ciao, {{ user.username }} 😀</p>
 
         {# Aggiungiamo un link per andare al dashboard se l'utente è loggato #}
-        <a href="{% url 'dashboard' %}">Vai alla Dashboard</a>
+        <a href="{% url 'core:dashboard' %}">Vai alla Dashboard</a>
 
         <form action="{% url 'logout' %}" method="post" style="margin-top: 1em;">
             {% csrf_token %}

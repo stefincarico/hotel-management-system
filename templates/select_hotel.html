@@ -9,7 +9,7 @@
         <ul>
         {% for hotel in hotels %}
             {# Ora il link punta al nostro nuovo URL, passando l'ID specifico di ogni hotel nel ciclo #}
-            <li><a href="{% url 'activate_hotel' hotel.id %}">{{ hotel.name }} ({{ hotel.city }})</a></li>
+            <li><a href="{% url 'core:activate_hotel' hotel.id %}">{{ hotel.name }} ({{ hotel.city }})</a></li>
         {% endfor %}
         </ul>
     {% else %}

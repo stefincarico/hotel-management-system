@@ -146,7 +146,7 @@ AUTH_USER_MODEL = 'core.User'
 
 LOGIN_REDIRECT_URL = 'select_hotel' # Usiamo il nome dell'URL, non il path
 LOGOUT_REDIRECT_URL = '/'
-LOGIN_URL = '/accounts/login/'
+LOGIN_REDIRECT_URL = 'core:select_hotel'
 
 # --- Impostazioni per django-cors-headers ---
 
