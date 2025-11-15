@@ -1,7 +1,7 @@
 # config/urls.py
 from django.contrib import admin
 from django.urls import path, include
-from core.views import get_add_room_button, homepage, dashboard, select_hotel, activate_hotel, room_list, toggle_room_status, create_room_form, create_room
+from core.views import get_add_room_button, homepage, dashboard, select_hotel, activate_hotel,update_room_form,update_room, room_list, toggle_room_status, create_room_form, create_room
 
 
 
@@ -20,5 +20,7 @@ urlpatterns = [
     path('rooms/create-form/', create_room_form, name='create_room_form'),
     path('rooms/create/', create_room, name='create_room'),
     path('rooms/add-button/', get_add_room_button, name='get_add_room_button'),
+    path('rooms/update-form/<int:room_id>/', update_room_form, name='update_room_form'), 
+    path('rooms/update/<int:room_id>/', update_room, name='update_room'),
 ]
 

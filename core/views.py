@@ -17,7 +17,6 @@ def homepage(request):
 def dashboard(request):
     return render(request, 'dashboard.html')
 
-
 @login_required
 def select_hotel(request):
     # Recuperiamo tutti i ruoli (e quindi gli hotel) associati all'utente corrente.
@@ -164,5 +163,37 @@ def create_room(request):
     
     return HttpResponse(html_response)
 
+@login_required
+def update_room_form(request, room_id):
+    active_hotel_id = request.session.get('active_hotel_id')
+    if not active_hotel_id:
+        return HttpResponse("Azione non permessa.", status=403)
+
+    # Recuperiamo la stanza specifica da modificare, sempre con il controllo di sicurezza
+    room = get_object_or_404(Room, pk=room_id, hotel_id=active_hotel_id)
+    
+    # Passiamo l'oggetto 'room' al template. Lo useremo per pre-compilare i campi.
+    context = {'room': room}
+    return render(request, 'partials/room_form.html', context)
+
+@require_POST
+@login_required
+def update_room(request, room_id):
+    active_hotel_id = request.session.get('active_hotel_id')
+    if not active_hotel_id:
+        return HttpResponse("Azione non permessa.", status=403)
+
+    # Recuperiamo la stanza da aggiornare, sempre con la massima sicurezza
+    room = get_object_or_404(Room, pk=room_id, hotel_id=active_hotel_id)
+    
+    # Aggiorniamo i campi dell'oggetto con i nuovi dati
+    room.room_number = request.POST.get('room_number')
+    room.room_type = request.POST.get('room_type')
+    room.price_per_night = request.POST.get('price_per_night')
+    room.save()
+    
+    # Restituiamo il partial della card AGGIORNATO
+    context = {'room': room}
+    return render(request, 'partials/room_card.html', context)
 
 
